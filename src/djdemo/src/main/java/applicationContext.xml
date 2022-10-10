@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+    <bean id="gpService" class="org.geoserver.djdemo.gp.GPService">
+    </bean>
+
+    <bean id="gpServiceDescriptor" class="org.geoserver.platform.Service">
+        <constructor-arg index="0" value="gp" />
+        <constructor-arg index="1" ref="gpService" />
+        <constructor-arg index="2" value="1.0.0" />
+        <constructor-arg index="3">
+            <list>
+                <value>getLengths</value>
+                <value>getBuffers</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="gpBufferKvpReader" class="org.geoserver.djdemo.gp.request.GPBufferKVPReader">
+        <constructor-arg value="org.geoserver.djdemo.gp.request.GPBufferRequest" />
+    </bean>
+
+    <bean id="gpLengthKvpReader" class="org.geoserver.djdemo.gp.request.GPLengthKVPReader">
+        <constructor-arg value="org.geoserver.djdemo.gp.request.GPLengthRequest" />
+    </bean>
+
+    <bean id="gpKvpReader" class="org.geoserver.djdemo.gp.request.GPKVPReader">
+        <constructor-arg value="org.geoserver.djdemo.gp.request.GPRequest" />
+    </bean>
+
+    <bean id="getLengthsResponse" class="org.geoserver.djdemo.gp.response.GPResponse">
+        <constructor-arg value="org.geoserver.djdemo.gp.response.GetLengthsTransform" />
+    </bean>
+
+    <bean id="getBuffersResponse" class="org.geoserver.djdemo.gp.response.GPResponse">
+        <constructor-arg value="org.geoserver.djdemo.gp.response.GetBuffersTransform" />
+    </bean>
+
+    <bean id="superOverlayKvpParser" class="org.geoserver.ows.kvp.DoubleKvpParser">
+        <constructor-arg value="distance" />
+    </bean>
+
+    <bean id="geomsWKTKvpParser" class="org.geoserver.djdemo.gp.request.GeomsWKTKvpParser">
+    </bean>
+
+    <bean id="wjDemos" class="org.geoserver.web.DemoLinkInfo">
+        <property name="id" value="wjDemos" />
+        <property name="titleKey" value="GPDemoPage.title" />
+        <property name="descriptionKey" value="GPDemoPage.shortDescription" />
+        <property name="componentClass" value="org.geoserver.djdemo.web.GPDemoPage" />
+    </bean>
+</beans>

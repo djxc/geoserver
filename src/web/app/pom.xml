@@ -234,6 +234,11 @@
       <version>${jetty.servlet-api.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.geoserver</groupId>
+      <artifactId>djdemo</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

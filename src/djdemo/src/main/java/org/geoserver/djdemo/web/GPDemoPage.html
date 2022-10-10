@@ -1,0 +1,107 @@
+<html xmlns:wicket="http://wicket.apache.org/">
+<head>
+<title><wicket:message key="page.title">Demo Request</wicket:message></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+<style type="text/css">
+/**
+ * Map Examples Specific
+ */
+.smallmap {
+	width: 400px;
+	height: 300px;
+	border: 1px solid #ccc;
+}
+</style>
+<script type="text/javascript"
+	src="http://openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript">
+	var map, writer, reader, lineLayer,plyLayer,handler;
+
+	function init() {
+		map = new OpenLayers.Map('map');
+
+		var wmsLayer = new OpenLayers.Layer.WMS("OpenLayers WMS",
+				"http://vmap0.tiles.osgeo.org/wms/vmap0?", {
+					layers : 'basic'
+				});
+
+		lineLayer = new OpenLayers.Layer.Vector("Line Layer");
+		plyLayer = new OpenLayers.Layer.Vector("Polygon Layer");
+		map.addLayers([ wmsLayer, plyLayer, lineLayer ]);
+
+		map.addControl(new OpenLayers.Control.LayerSwitcher());
+		map.addControl(new OpenLayers.Control.MousePosition());
+
+		var out_options = {
+			'internalProjection' : map.baseLayer.projection,
+			'externalProjection' : map.baseLayer.projection
+		};
+		writer = new OpenLayers.Format.WKT(out_options)
+		var in_options = {
+			'internalProjection' : map.baseLayer.projection,
+			'externalProjection' : map.baseLayer.projection
+		};
+		reader = new OpenLayers.Format.WKT(in_options);
+
+		var drawline = new OpenLayers.Control.DrawFeature(lineLayer,
+				OpenLayers.Handler.Path, {
+					eventListeners : {
+						"featureadded" : function(e) {
+							if(handler)
+								handler(writer.write(e.feature));
+						}
+					}
+				});
+
+		map.addControl(drawline);
+		map.setCenter(new OpenLayers.LonLat(0, 0), 3);
+
+		drawline.activate();
+		
+		setHandler("length");
+	}
+		
+	function length(str){
+		OpenLayers.Request
+		.GET({
+			url : "../ows?request=getlengths&service=gp&version=1.0.0&geoms="
+					+ str,
+			"success" : function(ee) {
+				alert(ee.responseText);
+			}
+		});
+	}
+
+	function buffer(str) {		
+		OpenLayers.Request
+				.GET({
+					url : "../ows?request=getbuffers&service=gp&version=1.0.0&distance=10&geoms="
+							+ str,
+					"success" : function(ee) {
+						var strs = ee.responseText.split("|");
+						for ( var i in strs) {
+							var features = reader.read(strs[i]);
+							plyLayer.addFeatures(features);
+						}
+					}
+				});
+	}
+	
+	var handlers={length:length,buffer:buffer};
+	function setHandler(name){
+		handler = handlers[name];
+		lineLayer.removeAllFeatures();
+		plyLayer.removeAllFeatures();
+	}
+</script>
+</head>
+<body onload="init();">
+	<div>
+		<div id="map" class="smallmap"></div><br>
+		<select onchange="setHandler(this.value)">
+			<option value="length"><wicket:message key="gp.lengths"></wicket:message></option>
+			<option value="buffer"><wicket:message key="gp.buffer"></wicket:message></option>
+		</select>
+	</div>
+</body>
+</html>

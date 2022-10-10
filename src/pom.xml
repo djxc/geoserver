@@ -49,6 +49,7 @@
     <module>web</module>
     <module>community</module>
     <module>extension</module>
+    <module>djdemo</module>
   </modules>
 
   <scm>
